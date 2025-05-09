@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Care Count - Value Unpaid Work</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Apply Poppins font globally */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff; /* Light background */
+        }
+        /* Custom gradient for hero */
+        .hero-gradient {
+            background: linear-gradient(140deg, #8b5cf6, #6366f1);
+        }
+        /* Custom gradient for the generated graphic */
+        .graphic-gradient {
+             background: linear-gradient(140deg, #8b5cf6, #6366f1);
+        }
+        /* Style for the generated graphic container */
+        .graphic-container {
+            max-width: 420px;
+            aspect-ratio: 9 / 12.5;
+            margin: 1rem auto; /* Center within its section */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            position: relative;
+        }
+         .graphic-main-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+        .graphic-value-display {
+            background-color: rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .graphic-value-amount {
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1.1;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+        }
+        .graphic-value-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+        .graphic-value-details {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .graphic-action-box {
+            background-color: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+        }
+        .graphic-action-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+        .graphic-action-text {
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        .graphic-footer {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .graphic-hashtags {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.25rem;
+            word-spacing: 4px;
+        }
+        .graphic-tagline {
+            font-size: 0.7rem;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+        .graphic-user-info {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            margin-top: 0.75rem;
+        }
+        /* Input field styling */
+        label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        input[type="number"], input[type="text"], select {
+             @apply mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+        }
+        /* Button styling */
+        .btn {
+            @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200;
+        }
+        .btn-primary {
+             @apply bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500;
+        }
+         .btn-secondary {
+             @apply bg-purple-600 hover:bg-purple-700 focus:ring-purple-500;
+         }
+         /* Section styling */
+         section {
+             @apply py-16 sm:py-20;
+         }
+         /* Hidden class */
+         .hidden {
+             display: none;
+         }
+         /* Simple loading spinner */
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #6366f1; /* Indigo */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <div class="flex-shrink-0">
+                <a href="#" class="text-2xl font-bold text-indigo-600 flex items-center">
+                    <i class="fas fa-heart-pulse mr-2 text-purple-600"></i> Make Care Count
+                </a>
+            </div>
+            <div class="hidden sm:flex sm:space-x-8">
+                <a href="#calculator" class="text-gray-500 hover:text-indigo-600 inline-flex items-center px-1 pt-1 text-sm font-medium">Calculator</a>
+                <a href="#about" class="text-gray-500 hover:text-indigo-600 inline-flex items-center px-1 pt-1 text-sm font-medium">About</a>
+                <a href="#resources" class="text-gray-500 hover:text-indigo-600 inline-flex items-center px-1 pt-1 text-sm font-medium">Resources</a>
+                </div>
+            <div class="sm:hidden">
+                 <button type="button" id="mobile-menu-button" class="text-gray-500 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                     <i class="fas fa-bars fa-lg"></i>
+                 </button>
+             </div>
+        </nav>
+         <div id="mobile-menu" class="hidden sm:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#calculator" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-700 hover:bg-gray-50">Calculator</a>
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-700 hover:bg-gray-50">About</a>
+                <a href="#resources" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-700 hover:bg-gray-50">Resources</a>
+                </div>
+        </div>
+    </header>
+
+    <section class="hero-gradient text-white text-center py-20 sm:py-28">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight mb-4">Unpaid care work powers the world.</h1>
+            <p class="text-xl sm:text-2xl font-medium mb-8 opacity-90">What's yours worth?</p>
+            <a href="#calculator" class="btn btn-secondary text-lg transform hover:scale-105 duration-200">
+                Calculate & Make It Count! <i class="fas fa-arrow-down ml-2 animate-bounce"></i>
+            </a>
+        </div>
+    </section>
+
+    <section id="calculator" class="bg-indigo-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+            <h2 class="text-3xl font-bold text-center text-indigo-800 mb-8">Calculate Your Unpaid Care Value</h2>
+            <form id="care-form" class="space-y-6 bg-white p-6 sm:p-8 rounded-lg shadow-lg">
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-700 mb-4 border-b pb-2 flex items-center">
+                        <i class="fa-solid fa-hand-holding-heart mr-2 text-lg"></i>Care I Provide <span class="text-sm font-normal text-gray-500 ml-2">(Average Hours/Week)</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label for="provide-childcare">Childcare:</label><input type="number" id="provide-childcare" name="provide-childcare" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-eldercare">Eldercare/Care for ill/disabled:</label><input type="number" id="provide-eldercare" name="provide-eldercare" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-cooking">Cooking & Meal Prep:</label><input type="number" id="provide-cooking" name="provide-cooking" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-cleaning">Cleaning & Household Chores:</label><input type="number" id="provide-cleaning" name="provide-cleaning" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-shopping">Shopping & Errands:</label><input type="number" id="provide-shopping" name="provide-shopping" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-admin">Household Admin/Finances:</label><input type="number" id="provide-admin" name="provide-admin" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-emotional">Emotional Support (Family/Friends):</label><input type="number" id="provide-emotional" name="provide-emotional" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-community">Community/Volunteer Work:</label><input type="number" id="provide-community" name="provide-community" min="0" value="0" required class="care-provide-input"></div>
+                        <div><label for="provide-other">Other Care Tasks:</label><input type="number" id="provide-other" name="provide-other" min="0" value="0" required class="care-provide-input"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-700 mb-4 border-b pb-2 flex items-center">
+                       <i class="fa-solid fa-hands-praying mr-2 text-lg"></i>Care I Receive <span class="text-sm font-normal text-gray-500 ml-2">(Average Hours/Week)</span>
+                    </h3>
+                     <p class="text-sm text-gray-600 mb-3">Estimate significant unpaid care you receive from others that enables your work/life.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label for="receive-childcare">Childcare:</label><input type="number" id="receive-childcare" name="receive-childcare" min="0" value="0" required class="care-receive-input"></div>
+                        <div><label for="receive-eldercare">Eldercare/Care for ill/disabled:</label><input type="number" id="receive-eldercare" name="receive-eldercare" min="0" value="0" required class="care-receive-input"></div>
+                        <div><label for="receive-cooking">Cooking & Meal Prep:</label><input type="number" id="receive-cooking" name="receive-cooking" min="0" value="0" required class="care-receive-input"></div>
+                        <div><label for="receive-cleaning">Cleaning & Household Chores:</label><input type="number" id="receive-cleaning" name="receive-cleaning" min="0" value="0" required class="care-receive-input"></div>
+                        <div><label for="receive-shopping">Shopping & Errands:</label><input type="number" id="receive-shopping" name="receive-shopping" min="0" value="0" required class="care-receive-input"></div>
+                         <div><label for="receive-emotional">Emotional Support (Family/Friends):</label><input type="number" id="receive-emotional" name="receive-emotional" min="0" value="0" required class="care-receive-input"></div>
+                         <div><label for="receive-other">Other Care Received:</label><input type="number" id="receive-other" name="receive-other" min="0" value="0" required class="care-receive-input"></div>
+                    </div>
+                </div>
+
+                 <div>
+                     <h3 class="text-xl font-semibold text-indigo-700 mb-4 border-b pb-2 flex items-center">
+                        <i class="fa-solid fa-dollar-sign mr-2 text-lg"></i>Valuation & Location
+                     </h3>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                         <div>
+                             <label for="hourly-rate">Your Local Hourly Rate ($):</label>
+                             <input type="number" id="hourly-rate" name="hourly-rate" min="0.01" step="0.01" placeholder="e.g., 15.50" required>
+                             <p class="text-xs text-gray-500 mt-1">Enter a rate reflecting fair pay for care work in your area (e.g., minimum wage, living wage).</p>
+                         </div>
+                          <div>
+                             <label for="location">Your Country/Region:</label>
+                             <input type="text" id="location" name="location" placeholder="e.g., Canada, California" required>
+                             <p class="text-xs text-gray-500 mt-1">This will appear on your shared graphic.</p>
+                         </div>
+                     </div>
+                 </div>
+
+                <div class="text-center pt-4">
+                    <button type="submit" class="btn btn-primary text-lg transform hover:scale-105 duration-200">
+                        <i class="fas fa-calculator mr-2"></i> Calculate My Care Value
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section id="results" class="hidden bg-white py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-6">Your Estimated Unpaid Care Value</h2>
+
+            <div id="graphic-preview-container">
+                 <div id="loading-spinner" class="loader hidden"></div>
+                 <p id="graphic-placeholder" class="text-gray-500 italic">Calculating...</p>
+            </div>
+
+            <div id="share-section" class="mt-8 hidden">
+                 <h3 class="text-xl font-semibold mb-4">Share Your Ledger!</h3>
+                 <div class="flex justify-center space-x-4">
+                    <button id="share-web-button" class="btn btn-secondary">
+                        <i class="fas fa-share-alt mr-2"></i> Share Now
+                    </button>
+                    <button id="download-button" class="btn bg-gray-500 hover:bg-gray-600 focus:ring-gray-400">
+                        <i class="fas fa-download mr-2"></i> Download/Screenshot
+                    </button>
+                 </div>
+                 <p id="share-fallback" class="text-sm text-gray-500 mt-3">Use 'Share Now' if available, or download/screenshot the graphic to share manually.</p>
+            </div>
+
+            <div class="mt-6">
+                 <a href="#calculator" id="recalculate-button" class="text-indigo-600 hover:text-indigo-800 underline">
+                     Calculate Again?
+                 </a>
+             </div>
+        </div>
+    </section>
+
+    <section id="about" class="bg-gray-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+             <h2 class="text-3xl font-bold text-center text-indigo-800 mb-8">About Make Care Count</h2>
+             <div class="space-y-4 text-gray-700 leading-relaxed">
+                <p>Unpaid care work – the cooking, cleaning, childcare, eldercare, emotional support, and community building – is the invisible engine powering our economies and societies. Globally, women perform over 76% of this essential labor, yet it remains largely unrecognized, undervalued, and unsupported by policy.</p>
+                <p>The <span class="font-semibold">Make Care Count</span> campaign, inspired by the demands of the <a href="[LINK_TO_W7_COMMUNIQUE_PDF]" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">Women 7 (W7) Communique</a>, aims to make this invisible work visible. By using our calculator, you can estimate the economic value of the unpaid care you provide and receive, based on a fair hourly rate for your region.</p>
+                <p>Generating and sharing your personalized "Unpaid Care Ledger" helps: </p>
+                <ul class="list-disc list-inside ml-4 space-y-1">
+                    <li>Raise awareness about the sheer scale and value of unpaid care.</li>
+                    <li>Challenge the notion that this work is free or low-value.</li>
+                    <li>Build collective power to demand policy change.</li>
+                    <li>Advocate for investment in care infrastructure, social protection, and fair wages for care workers.</li>
+                </ul>
+                 <p>We use a user-defined hourly rate because the value of care work varies globally, and fair compensation should reflect local realities (like minimum wage or living wage). This empowers you to state what care is worth in your community.</p>
+                <p class="font-semibold text-center mt-6">Join us! Calculate your value, share your ledger, and demand that policymakers #MakeCareCount!</p>
+             </div>
+        </div>
+    </section>
+
+    <section id="resources" class="bg-indigo-50">
+         <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+             <h2 class="text-3xl font-bold text-center text-indigo-800 mb-8">Resources & Further Reading</h2>
+             <ul class="space-y-3 text-gray-700">
+                 <li><i class="fas fa-link mr-2 text-indigo-500"></i><a href="[LINK_TO_W7_COMMUNIQUE_PDF]" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">Women 7 (W7) 2025 Communique</a> (Link to the PDF/Source)</li>
+                 <li><i class="fas fa-link mr-2 text-indigo-500"></i><a href="https://www.ilo.org/global/topics/care-economy/lang--en/index.htm" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">International Labour Organization (ILO) - Care Economy</a></li>
+                 <li><i class="fas fa-link mr-2 text-indigo-500"></i><a href="https://www.unwomen.org/en/news-stories/in-focus/2020/01/in-focus-the-care-economy" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">UN Women - In Focus: The Care Economy</a></li>
+                 <li><i class="fas fa-link mr-2 text-indigo-500"></i><a href="https://www.oxfam.org/en/what-we-do/issues/ending-extreme-inequality/care-economy" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">Oxfam International - Care Economy</a></li>
+                  <li><i class="fas fa-link mr-2 text-indigo-500"></i><a href="https://livingwage.mit.edu/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">MIT Living Wage Calculator (Example - US)</a></li>
+                  <li><i class="fas fa-link mr-2 text-indigo-500"></i><a href="https://wageindicator.org/salary/living-wage" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">WageIndicator Foundation - Living Wage (Global)</a></li>
+                 </ul>
+         </div>
+    </section>
+
+    <footer class="bg-gray-800 text-gray-300 py-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="mb-2">&copy; 2025 Make Care Count Campaign. Inspired by Women 7.</p>
+            <p class="text-sm">Making the invisible visible. Demanding investment in care.</p>
+             </div>
+    </footer>
+
+    <script>
+        // --- DOM Elements ---
+        const careForm = document.getElementById('care-form');
+        const resultsSection = document.getElementById('results');
+        const graphicPreviewContainer = document.getElementById('graphic-preview-container');
+        const shareWebButton = document.getElementById('share-web-button');
+        const shareFallback = document.getElementById('share-fallback');
+        const recalculateButton = document.getElementById('recalculate-button');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const graphicPlaceholder = document.getElementById('graphic-placeholder');
+        const shareSection = document.getElementById('share-section');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        // --- Helper Functions ---
+
+        // Function to format currency (simple example, adjust as needed)
+        function formatCurrency(value, currencySymbol = '$') {
+            // Basic formatting, replace with a more robust library for internationalization
+            return currencySymbol + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Function to generate a simple unique ID for the graphic reference
+        function generateRefId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        // Function to generate the graphic HTML (using structure from v3)
+        function generateGraphicHTML(data) {
+            const rateDescription = data.rateDescription || 'User Defined'; // Placeholder for potential future rate type selection
+            const locationDisplay = data.location ? data.location.trim() : 'Global';
+            const refId = generateRefId(); // Generate a unique ID for this instance
+
+            // Determine currency symbol based on rate input (basic example)
+            // A more robust solution would involve asking for currency or using locale
+            let currencySymbol = '$';
+            if (data.hourlyRateInput && data.hourlyRateInput.includes('€')) currencySymbol = '€';
+            if (data.hourlyRateInput && data.hourlyRateInput.includes('£')) currencySymbol = '£';
+            // Add more currencies as needed
+
+            return `
+            <div class="graphic-container graphic-gradient">
+                <div class="graphic-main-content">
+                    <div class="text-center mb-5">
+                         <i class="fa-solid fa-earth-americas fa-xl mb-1 text-white opacity-70"></i>
+                         <i class="fa-solid fa-scale-balanced fa-xl mb-1 text-white opacity-70 ml-2"></i>
+                        <h1 class="text-3xl font-black uppercase tracking-tight mt-1">Make Care Count</h1>
+                        <h2 class="text-md font-medium opacity-80">My Unpaid Care Ledger</h2>
+                    </div>
+                    <div>
+                        <div class="graphic-value-display">
+                            <p class="graphic-value-label">
+                                <i class="fa-solid fa-hand-holding-heart"></i> Care Provided
+                            </p>
+                            <p class="graphic-value-amount">${formatCurrency(data.annualProvidedValue, currencySymbol)}</p>
+                            <p class="graphic-value-details">Est. Annual Value (${data.totalProvidedHours.toFixed(1)} hrs/wk)</p>
+                        </div>
+                        <div class="graphic-value-display">
+                             <p class="graphic-value-label">
+                                <i class="fa-solid fa-hands-praying"></i> Care Received
+                             </p>
+                             <p class="graphic-value-amount">${formatCurrency(data.annualReceivedValue, currencySymbol)}</p>
+                             <p class="graphic-value-details">Est. Annual Value (${data.totalReceivedHours.toFixed(1)} hrs/wk)</p>
+                        </div>
+                         <p class="text-center text-xs opacity-70 -mt-2 mb-4">
+                            Basis: Valued at <span class="font-semibold">${currencySymbol}${data.hourlyRate.toFixed(2)}/hour</span> (${rateDescription})
+                         </p>
+                    </div>
+                    <div class="graphic-action-box text-center">
+                        <p class="graphic-action-title">
+                            <i class="fa-solid fa-bullhorn"></i> Action Required:
+                        </p>
+                        <p class="graphic-action-text">
+                            Recognize, Reduce, Redistribute & Reward Unpaid Care Work NOW! Invest in Global Care Infrastructure & Social Protection.
+                        </p>
+                    </div>
+                     <div class="text-center graphic-user-info">
+                        <span>Generated by: A Global Citizen</span>
+                        <span class="mx-1">|</span>
+                        <span>Location: ${locationDisplay}</span>
+                        <span class="block text-xs">Ref: #MakeCareCount-${refId}</span>
+                    </div>
+                </div>
+                <div class="graphic-footer">
+                    <div class="graphic-hashtags">
+                        #MakeCareCount #UnpaidWork #CareEconomy #W7 #GenderJustice #CareIsWork
+                    </div>
+                    <p class="graphic-tagline">
+                         <i class="fa-solid fa-lightbulb opacity-80"></i> The invisible work that powers the world. It's time to make it count.
+                    </p>
+                </div>
+            </div>
+            `;
+        }
+
+        // --- Event Listeners ---
+
+        // Form Submission Handler
+        careForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            console.log("Form submitted"); // Debug log
+
+            // Show loading state
+            resultsSection.classList.remove('hidden');
+            graphicPreviewContainer.innerHTML = ''; // Clear previous graphic
+            loadingSpinner.classList.remove('hidden');
+            graphicPlaceholder.classList.add('hidden');
+            shareSection.classList.add('hidden'); // Hide share buttons while loading
+
+
+            // Scroll to results smoothly
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+
+            // --- Simulate processing delay ---
+            setTimeout(() => {
+                try {
+                    // --- Get Input Values ---
+                    const formData = new FormData(careForm);
+                    const hourlyRateInput = formData.get('hourly-rate'); // Keep original input for currency check
+                    const hourlyRate = parseFloat(hourlyRateInput); // Parse for calculation
+                    const location = formData.get('location');
+
+                    // --- Basic Validation ---
+                    if (isNaN(hourlyRate) || hourlyRate <= 0) {
+                        alert('Please enter a valid positive hourly rate.');
+                        loadingSpinner.classList.add('hidden'); // Hide spinner on error
+                        graphicPlaceholder.classList.remove('hidden');
+                        graphicPlaceholder.textContent = 'Error: Invalid hourly rate.';
+                        resultsSection.classList.add('hidden'); // Hide results section again
+                        return;
+                    }
+                    if (!location || location.trim() === '') {
+                         alert('Please enter your country or region.');
+                         loadingSpinner.classList.add('hidden');
+                         graphicPlaceholder.classList.remove('hidden');
+                         graphicPlaceholder.textContent = 'Error: Location missing.';
+                         resultsSection.classList.add('hidden');
+                         return;
+                    }
+
+                    // --- Calculate Total Hours ---
+                    let totalProvidedHours = 0;
+                    document.querySelectorAll('.care-provide-input').forEach(input => {
+                        totalProvidedHours += parseFloat(input.value) || 0;
+                    });
+
+                    let totalReceivedHours = 0;
+                     document.querySelectorAll('.care-receive-input').forEach(input => {
+                        totalReceivedHours += parseFloat(input.value) || 0;
+                    });
+
+                    // --- Calculate Values ---
+                    const weeklyProvidedValue = totalProvidedHours * hourlyRate;
+                    const annualProvidedValue = weeklyProvidedValue * 52;
+                    const weeklyReceivedValue = totalReceivedHours * hourlyRate;
+                    const annualReceivedValue = weeklyReceivedValue * 52;
+
+                    // --- Prepare Data for Graphic ---
+                    const graphicData = {
+                        totalProvidedHours,
+                        annualProvidedValue,
+                        totalReceivedHours,
+                        annualReceivedValue,
+                        hourlyRate,
+                        hourlyRateInput, // Pass original input for currency check
+                        location,
+                        // rateDescription: 'User Defined' // Add logic if rate type selection is added
+                    };
+
+                    // --- Generate and Display Graphic ---
+                    const graphicHTML = generateGraphicHTML(graphicData);
+                    graphicPreviewContainer.innerHTML = graphicHTML; // Inject the generated HTML
+                    loadingSpinner.classList.add('hidden'); // Hide spinner
+                    graphicPlaceholder.classList.add('hidden');
+                    shareSection.classList.remove('hidden'); // Show share buttons
+
+                } catch (error) {
+                    console.error("Calculation Error:", error);
+                    alert("An error occurred during calculation. Please check your inputs.");
+                    loadingSpinner.classList.add('hidden');
+                    graphicPlaceholder.classList.remove('hidden');
+                    graphicPlaceholder.textContent = 'Calculation Error.';
+                    resultsSection.classList.add('hidden');
+                }
+            }, 500); // End of setTimeout (simulated delay)
+
+        });
+
+        // Share Button Handler (Web Share API)
+        shareWebButton.addEventListener('click', async () => {
+            const shareData = {
+                title: 'Make Care Count',
+                text: `I calculated my unpaid care value! See how much invisible work powers our world. #MakeCareCount`,
+                url: window.location.href // Share the link to the calculator
+            };
+
+            // Add file sharing if possible (more complex, requires generating image blob)
+            // For now, just shares text/URL
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                    console.log('Shared successfully');
+                } catch (err) {
+                    console.error('Share failed:', err.message);
+                    shareFallback.classList.remove('hidden'); // Show fallback if share fails
+                }
+            } else {
+                console.log('Web Share API not supported.');
+                shareFallback.classList.remove('hidden'); // Show fallback if API not supported
+            }
+        });
+
+        // Recalculate Button Handler (Scrolls back up)
+        recalculateButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const calculatorSection = document.getElementById('calculator');
+            calculatorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Optionally hide results again
+             // resultsSection.classList.add('hidden');
+        });
+
+         // Mobile Menu Toggle
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+    </script>
+
+</body>
+</html>
+
